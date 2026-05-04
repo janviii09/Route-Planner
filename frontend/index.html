@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Route Planner</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>AI Route Planner</h1>
+                <p>Advanced Graph Routing Engine</p>
+            </div>
+
+            <div class="control-group">
+                <label for="srcNode">Source Node</label>
+                <select id="srcNode"></select>
+            </div>
+
+            <div class="control-group">
+                <label for="destNode">Destination Node</label>
+                <select id="destNode"></select>
+            </div>
+
+            <div class="toggles">
+                <label class="toggle-container">
+                    <input type="checkbox" id="emergencyMode">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Emergency Mode (BFS)</span>
+                </label>
+
+                <label class="toggle-container">
+                    <input type="checkbox" id="negativeWeights">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Negative Weights Allowed</span>
+                </label>
+
+                <label class="toggle-container">
+                    <input type="checkbox" id="useHeuristic" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Use Spatial Heuristic (A*)</span>
+                </label>
+            </div>
+
+            <div class="actions">
+                <button id="findRouteBtn" class="primary-btn">Find Optimal Route</button>
+                <button id="findMstBtn" class="secondary-btn">Show Minimum Spanning Tree</button>
+            </div>
+
+            <div class="congestion-query">
+                <h3>Peak Congestion Query</h3>
+                <p>O(log n) Segment Tree</p>
+                <div class="control-group">
+                    <label>Select Edge</label>
+                    <select id="edgeSelect"></select>
+                </div>
+                <div class="time-range">
+                    <input type="number" id="startHour" min="6" max="24" value="8" title="Start Hour">
+                    <span>to</span>
+                    <input type="number" id="endHour" min="6" max="24" value="10" title="End Hour">
+                </div>
+                <button id="queryCongestionBtn" class="secondary-btn small-btn">Query Peak Weight</button>
+                <div id="congestionResult" class="query-result"></div>
+            </div>
+
+            <div id="results" class="results-panel hidden">
+                <h3>Routing Results</h3>
+                <div class="result-row">
+                    <span>Algorithm:</span>
+                    <strong id="algoName">-</strong>
+                </div>
+                <div class="result-row">
+                    <span>Total Cost:</span>
+                    <strong id="totalCost">-</strong>
+                </div>
+                <div class="result-path">
+                    <span>Path:</span>
+                    <div id="pathNodes" class="path-nodes"></div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="canvas-container">
+            <div class="time-slider-container">
+                <div class="time-label">Current Time: <span id="timeDisplay">06:00</span></div>
+                <input type="range" id="timeSlider" min="6" max="24" value="6" class="slider">
+                <div class="time-ticks">
+                    <span>6am</span><span>12pm</span><span>6pm</span><span>12am</span>
+                </div>
+            </div>
+            <canvas id="graphCanvas"></canvas>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
