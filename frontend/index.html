@@ -15,10 +15,16 @@
                 <p>Advanced Graph Routing Engine</p>
             </div>
 
-            <div class="control-group">
-                <label for="srcNode">Source Node</label>
-                <select id="srcNode"></select>
+            <div class="mode-switcher">
+                <button id="modeRouting" class="mode-btn active">Routing Mode</button>
+                <button id="modeInfra" class="mode-btn">Infrastructure Mode</button>
             </div>
+
+            <div id="routingModeControls">
+                <div class="control-group">
+                    <label for="srcNode">Source Node</label>
+                    <select id="srcNode"></select>
+                </div>
 
             <div class="control-group">
                 <label for="destNode">Destination Node</label>
@@ -45,38 +51,54 @@
                 </label>
             </div>
 
-            <div class="actions">
-                <button id="findRouteBtn" class="primary-btn">Find Optimal Route</button>
-                <button id="findMstBtn" class="secondary-btn">Show Minimum Spanning Tree</button>
+                <div class="actions">
+                    <button id="findRouteBtn" class="primary-btn">Find Optimal Route</button>
+                </div>
+
+                <div class="congestion-query">
+                    <h3>Peak Congestion Query</h3>
+                    <p>O(log n) Segment Tree</p>
+                    <div class="control-group">
+                        <label>Select Edge</label>
+                        <select id="edgeSelect"></select>
+                    </div>
+                    <div class="time-range">
+                        <input type="number" id="startHour" min="6" max="24" value="8" title="Start Hour">
+                        <span>to</span>
+                        <input type="number" id="endHour" min="6" max="24" value="10" title="End Hour">
+                    </div>
+                    <button id="queryCongestionBtn" class="secondary-btn small-btn">Query Peak Weight</button>
+                    <div id="congestionResult" class="query-result"></div>
+                </div>
             </div>
 
-            <div class="congestion-query">
-                <h3>Peak Congestion Query</h3>
-                <p>O(log n) Segment Tree</p>
-                <div class="control-group">
-                    <label>Select Edge</label>
-                    <select id="edgeSelect"></select>
+            <div id="infrastructureModeControls" class="hidden">
+                <div class="infra-info">
+                    <h3>City Planner Mode</h3>
+                    <p>Find the minimum-cost network to connect all city zones.</p>
+                    <p><strong>Algorithm:</strong> Kruskal's Greedy MST</p>
+                    <p><strong>Cycle Detection:</strong> Disjoint Set Union (DSU)</p>
                 </div>
-                <div class="time-range">
-                    <input type="number" id="startHour" min="6" max="24" value="8" title="Start Hour">
-                    <span>to</span>
-                    <input type="number" id="endHour" min="6" max="24" value="10" title="End Hour">
+                <div class="actions">
+                    <button id="findMstBtn" class="primary-btn" style="background-color: var(--accent-green)">Animate Kruskal's MST</button>
                 </div>
-                <button id="queryCongestionBtn" class="secondary-btn small-btn">Query Peak Weight</button>
-                <div id="congestionResult" class="query-result"></div>
             </div>
 
             <div id="results" class="results-panel hidden">
-                <h3>Routing Results</h3>
+                <h3>Results</h3>
                 <div class="result-row">
-                    <span>Algorithm:</span>
+                    <span id="algoLabel">Algorithm:</span>
                     <strong id="algoName">-</strong>
                 </div>
                 <div class="result-row">
-                    <span>Total Cost:</span>
+                    <span id="costLabel">Total Cost:</span>
                     <strong id="totalCost">-</strong>
                 </div>
-                <div class="result-path">
+                <div class="result-row hidden" id="savingsRow">
+                    <span>Cost Saved:</span>
+                    <strong id="costSaved" style="color: var(--accent-green)">-</strong>
+                </div>
+                <div class="result-path" id="pathDisplaySection">
                     <span>Path:</span>
                     <div id="pathNodes" class="path-nodes"></div>
                 </div>

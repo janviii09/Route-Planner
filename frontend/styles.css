@@ -57,6 +57,56 @@ body {
     color: var(--text-secondary);
 }
 
+.mode-switcher {
+    display: flex;
+    background-color: #0f172a;
+    border-radius: 8px;
+    padding: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.mode-btn.active {
+    background-color: var(--bg-panel);
+    color: var(--text-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.infra-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.infra-info h3 {
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.infra-info p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
 .control-group {
     display: flex;
     flex-direction: column;

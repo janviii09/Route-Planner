@@ -3,6 +3,8 @@ const ctx = canvas.getContext('2d');
 let graphData = null;
 let currentPath = [];
 let mstEdges = [];
+let rejectedEdges = [];
+let animationTimeout = null;
 
 // DOM Elements
 const srcSelect = document.getElementById('srcNode');
@@ -10,6 +12,16 @@ const destSelect = document.getElementById('destNode');
 const btnRoute = document.getElementById('findRouteBtn');
 const btnMst = document.getElementById('findMstBtn');
 const resultsPanel = document.getElementById('results');
+
+const modeRouting = document.getElementById('modeRouting');
+const modeInfra = document.getElementById('modeInfra');
+const routingModeControls = document.getElementById('routingModeControls');
+const infrastructureModeControls = document.getElementById('infrastructureModeControls');
+const savingsRow = document.getElementById('savingsRow');
+const costSaved = document.getElementById('costSaved');
+const pathDisplaySection = document.getElementById('pathDisplaySection');
+const algoLabel = document.getElementById('algoLabel');
+const costLabel = document.getElementById('costLabel');
 
 const timeSlider = document.getElementById('timeSlider');
 const timeDisplay = document.getElementById('timeDisplay');
@@ -104,19 +116,22 @@ function drawGraph() {
         const p1 = transform(u.x, u.y);
         const p2 = transform(v.x, v.y);
 
-        // Check if edge is in MST
+        // Check if edge is in MST or rejected
         const isMst = mstEdges.some(e => (e.u === edge.u && e.v === edge.v) || (e.u === edge.v && e.v === edge.u));
+        const isRejected = rejectedEdges.some(e => (e.u === edge.u && e.v === edge.v) || (e.u === edge.v && e.v === edge.u));
         
         // Thicken if traffic is high
         const multiplier = edge.base_weight ? (edge.weight / edge.base_weight) : 1;
-        const thickness = isMst ? 6 : (2 + (multiplier - 1) * 3);
+        let thickness = isMst || isRejected ? 6 : (2 + (multiplier - 1) * 3);
         
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
         ctx.lineTo(p2.x, p2.y);
         
-        // Color redder if congested
-        if (isMst) {
+        // Coloring logic
+        if (isRejected) {
+            ctx.strokeStyle = '#ef4444'; // Red to show cycle detection
+        } else if (isMst) {
             ctx.strokeStyle = '#10b981';
         } else if (multiplier >= 2.5) {
             ctx.strokeStyle = '#ef4444'; // Heavy traffic
@@ -182,6 +197,9 @@ function drawGraph() {
 }
 
 btnRoute.addEventListener('click', async () => {
+    if (animationTimeout) clearTimeout(animationTimeout);
+    rejectedEdges = [];
+
     const payload = {
         src: srcSelect.value,
         dest: destSelect.value,
@@ -205,6 +223,11 @@ btnRoute.addEventListener('click', async () => {
 
     // Update UI
     resultsPanel.classList.remove('hidden');
+    savingsRow.classList.add('hidden');
+    pathDisplaySection.classList.remove('hidden');
+    
+    algoLabel.textContent = 'Algorithm:';
+    costLabel.textContent = 'Total Cost:';
     document.getElementById('algoName').textContent = data.algorithm;
     document.getElementById('totalCost').textContent = data.cost;
     
@@ -231,19 +254,78 @@ btnRoute.addEventListener('click', async () => {
 });
 
 btnMst.addEventListener('click', async () => {
+    if (animationTimeout) clearTimeout(animationTimeout);
+    
     const res = await fetch(`/api/mst?hour=${timeSlider.value}`);
     const data = await res.json();
     
     currentPath = []; // Clear Route
-    mstEdges = data.edges || [];
+    mstEdges = [];
+    rejectedEdges = [];
     drawGraph();
     
     resultsPanel.classList.remove('hidden');
-    document.getElementById('algoName').textContent = "Kruskal's MST";
-    document.getElementById('totalCost').textContent = data.total_weight;
+    savingsRow.classList.add('hidden');
+    pathDisplaySection.classList.add('hidden');
     
-    const pathNodesContainer = document.getElementById('pathNodes');
-    pathNodesContainer.innerHTML = '<span style="color: #10b981;">Showing Minimum Spanning Tree</span>';
+    algoLabel.textContent = 'Algorithm:';
+    costLabel.textContent = 'Network Cost:';
+    document.getElementById('algoName').textContent = "Kruskal's MST";
+    document.getElementById('totalCost').textContent = 'Calculating...';
+    
+    const trace = data.trace || [];
+    let i = 0;
+    
+    function animateStep() {
+        if (i >= trace.length) {
+            document.getElementById('totalCost').textContent = data.total_weight;
+            savingsRow.classList.remove('hidden');
+            costSaved.textContent = (data.full_cost - data.total_weight).toFixed(1) + ' (Saved by DSU)';
+            rejectedEdges = [];
+            drawGraph();
+            return;
+        }
+        
+        const step = trace[i];
+        if (step.status === 'accepted') {
+            mstEdges.push({u: step.u, v: step.v});
+        } else {
+            rejectedEdges.push({u: step.u, v: step.v});
+            setTimeout(() => {
+                rejectedEdges = rejectedEdges.filter(e => e.u !== step.u || e.v !== step.v);
+                drawGraph();
+            }, 800);
+        }
+        
+        drawGraph();
+        i++;
+        animationTimeout = setTimeout(animateStep, 500);
+    }
+    
+    animateStep();
+});
+
+// Mode switchers
+modeRouting.addEventListener('click', () => {
+    modeRouting.classList.add('active');
+    modeInfra.classList.remove('active');
+    routingModeControls.classList.remove('hidden');
+    infrastructureModeControls.classList.add('hidden');
+    resultsPanel.classList.add('hidden');
+    if (animationTimeout) clearTimeout(animationTimeout);
+    mstEdges = [];
+    rejectedEdges = [];
+    drawGraph();
+});
+
+modeInfra.addEventListener('click', () => {
+    modeInfra.classList.add('active');
+    modeRouting.classList.remove('active');
+    infrastructureModeControls.classList.remove('hidden');
+    routingModeControls.classList.add('hidden');
+    resultsPanel.classList.add('hidden');
+    currentPath = [];
+    drawGraph();
 });
 
 // Time slider event

@@ -54,9 +54,9 @@ def get_route(req: RouteRequest):
 @app.get("/api/mst")
 def get_mst(hour: int = 6):
     traffic_manager.apply_traffic(hour)
-    mst_edges, total_weight = kruskal(graph)
+    mst_edges, total_weight, full_cost, trace = kruskal(graph)
     edges_list = [{"u": e.u, "v": e.v, "weight": e.weight} for e in mst_edges]
-    return {"total_weight": total_weight, "edges": edges_list}
+    return {"total_weight": total_weight, "full_cost": full_cost, "edges": edges_list, "trace": trace}
 
 @app.get("/api/peak_congestion")
 def get_peak_congestion(u: str, v: str, start_hour: int, end_hour: int):
