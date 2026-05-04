@@ -70,14 +70,3 @@ Dynamically switches between algorithms based on real-time constraints:
    Open your web browser and navigate to: [http://localhost:8000](http://localhost:8000)
 
 ---
-
-## 🎓 Academic / Viva Talking Points
-
-* **"Why is Dijkstra $O(E \log V)$?"**
-  * By utilizing a Min-Heap priority queue, we reduce the complexity of extracting the minimum node from $O(V)$ to $O(\log V)$.
-* **"When does A* beat Dijkstra?"**
-  * When a strong spatial heuristic (like Euclidean distance) is available, A* expands significantly fewer nodes by aggressively guiding the search toward the destination.
-* **"Why Union-Find before routing?"**
-  * Running a pre-check with DSU ($O(\alpha(V)) \approx O(1)$) instantly determines if a path is even mathematically possible, preventing wasted routing cycles on disconnected graphs.
-* **"Why implement a Segment Tree for Traffic?"**
-  * Traffic is highly dynamic time-series data. Querying peak congestion dynamically using a Segment Tree reduces lookup time for large arbitrary time windows to $O(\log n)$.
